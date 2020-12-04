@@ -1,5 +1,6 @@
 package monkeylord.XServer;
 
+import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.content.res.XModuleResources;
 import android.os.Build;
@@ -47,7 +48,7 @@ public class XposedEntry implements IXposedHookLoadPackage, IXposedHookZygoteIni
     }
 
     @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
 
         //告知界面模块已启动，同时解除Android N以上对MODE_WORLD_READABLE的限制
         if (loadPackageParam.packageName.equals("monkeylord.xserver")) {
@@ -57,16 +58,24 @@ public class XposedEntry implements IXposedHookLoadPackage, IXposedHookZygoteIni
         }
         //获取目标包名
         sPrefs.reload();
-        String targetApp = sPrefs.getString("targetApp", "MadMode");
+        final String targetApp = sPrefs.getString("targetApp", "MadMode");
         //if(targetApp.equals("MadMode"))XposedBridge.log("XServer Cannot Figure Out TargetApp...Hooking Everyone Now!!");
         if (!targetApp.equals("MadMode")&&!loadPackageParam.packageName.equals(targetApp)) return;
-        gatherInfo(loadPackageParam);
         //启动XServer
-        if(!targetApp.equals("MadMode"))new XServer(8000);
-        new XServer(Process.myPid());
-        XposedBridge.log("XServer Listening... on"+loadPackageParam.packageName + "@" + Process.myPid());
-        setXposedHookProvider();
-        XposedBridge.log("Using XposedHook...@" + Process.myPid());
+        XposedHelpers.findAndHookMethod("s.h.e.l.l.S", loadPackageParam.classLoader, "onCreate", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                Application appClz = (Application) param.thisObject;
+                ClassLoader realClassLoader = appClz.getClassLoader();
+                gatherInfo(loadPackageParam, realClassLoader);
+
+                if (!targetApp.equals("MadMode")) new XServer(8000);
+                new XServer(Process.myPid());
+                XposedBridge.log("XServer Listening... on" + loadPackageParam.packageName + "@" + Process.myPid());
+                setXposedHookProvider();
+                XposedBridge.log("Using XposedHook...@" + Process.myPid());
+            }
+        });
     }
 
     void setXposedHookProvider(){
@@ -122,10 +131,10 @@ public class XposedEntry implements IXposedHookLoadPackage, IXposedHookZygoteIni
         });
     }
 
-    private void gatherInfo(XC_LoadPackage.LoadPackageParam loadPackageParam) {
+    private void gatherInfo(XC_LoadPackage.LoadPackageParam loadPackageParam, ClassLoader realClassLoader) {
         packageName = loadPackageParam.packageName;
         isFirstApplication = loadPackageParam.isFirstApplication;
-        classLoader = loadPackageParam.classLoader;
+        classLoader = realClassLoader;
         processName = loadPackageParam.processName;
         appInfo = loadPackageParam.appInfo;
     }
