@@ -53,7 +53,7 @@ public class wsMethodView implements XServer.wsOperation {
                 if(args.get("javaname")!=null) {
                     m = MethodHandler.getMethodbyJavaName(args.get("javaname"));
                 }
-                if(m==null)m = Class.forName(args.get("class"), false, XposedEntry.classLoader)
+                if(m==null)m = Class.forName(args.get("class"), true, XposedEntry.classLoader)
                         .getDeclaredMethods()[Integer.parseInt(args.get("method"))];
             } catch (Exception e) {
                 e.printStackTrace();
@@ -263,7 +263,7 @@ public class wsMethodView implements XServer.wsOperation {
 
         public void hook(String clzn, String methodRegEx) throws ClassNotFoundException {
             Pattern pattern = Pattern.compile(methodRegEx);
-            for (Member method : Class.forName(clzn, false, XposedEntry.classLoader).getDeclaredMethods()) {
+            for (Member method : Class.forName(clzn, true, XposedEntry.classLoader).getDeclaredMethods()) {
                 if (pattern.matcher(method.getName()).matches() && !method.isSynthetic())
                     this.hook(method);
             }

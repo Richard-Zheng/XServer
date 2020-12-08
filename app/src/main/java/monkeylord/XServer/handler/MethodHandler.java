@@ -27,7 +27,7 @@ public class MethodHandler {
 
     public static Method getMethod(String className, String methodName) {
         try {
-            for (Method method : Class.forName(className, false, XServer.classLoader).getMethods()) {
+            for (Method method : Class.forName(className, true, XServer.classLoader).getMethods()) {
                 if (method.getName().equals(methodName)) return method;
             }
             return null;

@@ -88,7 +88,7 @@ public class wsTracer implements XServer.wsOperation {
                         if(clzn.startsWith("android"))continue;
                         if (clzn.contains(req.classn)) {
                             try {
-                                if (Class.forName(clzn, false, XposedEntry.classLoader).isInterface())
+                                if (Class.forName(clzn, true, XposedEntry.classLoader).isInterface())
                                     continue;
                                 sb.append(clzn + "<br/>");
                                 myhook.hook(clzn, req.method);
@@ -278,8 +278,8 @@ public class wsTracer implements XServer.wsOperation {
 
         public void hook(String clzn, String methodRegEx) throws ClassNotFoundException {
             Pattern pattern = Pattern.compile(methodRegEx);
-            for (int i = 0; i < Class.forName(clzn, false, XposedEntry.classLoader).getDeclaredMethods().length; i++) {
-                Member method = Class.forName(clzn, false, XposedEntry.classLoader).getDeclaredMethods()[i];
+            for (int i = 0; i < Class.forName(clzn, true, XposedEntry.classLoader).getDeclaredMethods().length; i++) {
+                Member method = Class.forName(clzn, true, XposedEntry.classLoader).getDeclaredMethods()[i];
                 mids.put(method.getDeclaringClass() + method.getName(), String.valueOf(i));
                 if (pattern.matcher(method.getName()).matches() && !method.isSynthetic())
                     unhooks.put(clzn + "." + method.getName() + "@" + method.hashCode(), hook(method));

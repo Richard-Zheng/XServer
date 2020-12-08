@@ -39,7 +39,7 @@ public class ClassHandler {
 
     public static Class findClassbyName(String clzName, ClassLoader classLoader) {
         try {
-            return Class.forName(clzName, false, classLoader);
+            return Class.forName(clzName, true, classLoader);
         } catch (ClassNotFoundException e) {
             return null;
         }
@@ -49,7 +49,7 @@ public class ClassHandler {
         try {
             String clzName = javaName.replace('/', '.').replace(";", "");
             clzName = (clzName.charAt(0) == 'L') ? clzName.substring(1) : clzName;
-            return Class.forName(clzName, false, classLoader);
+            return Class.forName(clzName, true, classLoader);
         } catch (ClassNotFoundException e) {
             return null;
         }

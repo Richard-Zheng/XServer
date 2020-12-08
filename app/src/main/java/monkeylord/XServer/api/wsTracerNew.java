@@ -66,7 +66,7 @@ public class wsTracerNew implements XServer.wsOperation {
                     classes = ((JSONArray) req.get("classes")).toArray(methods);
                     for (String clzname:classes) {
                         try {
-                            Class clz = Class.forName(clzname, false, XServer.classLoader);
+                            Class clz = Class.forName(clzname, true, XServer.classLoader);
                             for (Method m : clz.getDeclaredMethods()) {
                                 String mtd = Utils.getJavaName(m);
                                 if (!unhooks.containsKey(mtd))
@@ -97,7 +97,7 @@ public class wsTracerNew implements XServer.wsOperation {
                     classes = ((JSONArray) req.get("classes")).toArray(classes);
                     for (String clz:classes) {
                         try{
-                            for (Method method:Class.forName(clz,false,XServer.classLoader).getDeclaredMethods()) {
+                            for (Method method:Class.forName(clz,true,XServer.classLoader).getDeclaredMethods()) {
                                 methodArr.add(Utils.getJavaName(method));
                             }
                             clzArr.add(clz);

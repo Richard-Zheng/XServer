@@ -22,7 +22,7 @@ public class Invoke extends BaseOperation {
         }
 
         try {
-            Method[] methods = Class.forName(parms.get("class"), false, XServer.classLoader).getDeclaredMethods();
+            Method[] methods = Class.forName(parms.get("class"), true, XServer.classLoader).getDeclaredMethods();
             Method m = methods[Integer.parseInt(parms.get("method"))];
             params = new Object[m.getParameterTypes().length];
             for (int i = 0; i < m.getParameterTypes().length; i++) {
